@@ -1,6 +1,6 @@
 <?php
 
-namespace jackh/dashboard;
+namespace jackh\dashboard;
 
 class Module extends \yii\base\Module
 {
