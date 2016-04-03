@@ -1,0 +1,34 @@
+{
+    "name": "jackh/yii2-dashboard",
+
+    "type": "yii2-extension",
+
+    "description": "The extension of dashboard for the Yii framework",
+    "keywords": ["yii2", "dashbaord"],
+    "license": "BSD-3-Clause",
+    "support": {
+        "source": "https://github.com/jayHuang332/yii2-dashboard"
+    },
+    "authors": [
+        {
+            "name": "Jack.Huang",
+            "email": "jstrive@foxmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+        "mdmsoft/yii2-admin": "~2.0",
+        "omnilight/yii2-scheduling": "*",
+        "2amigos/yii2-chartjs-widget": "~2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "jackh\\aurora\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
