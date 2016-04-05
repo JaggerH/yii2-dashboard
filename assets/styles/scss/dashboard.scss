@@ -1,0 +1,240 @@
+@import "mixins/vendor-prefixes";
+@import "mixins/border-radius";
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+$dashboard-menu-width: 16%;
+$dashboard-main-width: 84%;
+$dashboard-list-width: 35%;
+$dashboard-content-width: 65%;
+$dashboard-sidebar-bg-color: RGB(34, 45, 48);
+$dashboard-banner-bg: RGB(85, 164, 211);
+$dashboard-header-height: 72px;
+$dashboard-header-toolbar-color: RGB(92, 101, 125);
+$dashboard-header-toolbar-hover-color: #23527c;
+.dashboard-menu,
+.dashboard-main,
+.dashboard-list,
+.dashboard-content {
+    height: 100%;
+    position: absolute;
+    display: block;
+}
+
+#dashboard-content {
+    padding: 30px;
+}
+
+.dashboard-menu {
+    width: $dashboard-menu-width;
+    background: white;
+    background: $dashboard-sidebar-bg-color;
+    @include box-shadow(2px 0px 5px rgba(0, 0, 0, .05));
+    .dashboard-banner {
+        background: $dashboard-banner-bg;
+        height: $dashboard-header-height;
+        text-align: center;
+        & > h1,
+        & > h3 {
+            color: white;
+            margin: 0;
+            line-height: $dashboard-header-height;
+        }
+    }
+}
+
+.dashboard-list,
+.dashboard-content {
+    .dashboard-header {
+        width: 100%;
+        height: $dashboard-header-height;
+        @include box-shadow(0px 14px 20px rgba(0, 0, 0, 0.05));
+        padding: 0 20px;
+        .toolbar {
+            line-height: $dashboard-header-height;
+            display: inline-block;
+            color: $dashboard-header-toolbar-color;
+            text-decoration: none;
+            padding: 0 5px;
+            cursor: pointer;
+            &:hover,
+            &:active,
+            &:focus {
+                color: $dashboard-header-toolbar-hover-color;
+            }
+            .fa {
+                font-size: 20px;
+            }
+        }
+    }
+}
+
+.dashboard-content .dashboard-header {
+    background: white;
+}
+
+$dashboard-list-bg-color: RGB(244, 245, 249);
+$list-text-lines: 2;
+$list-text-font-size: 14px;
+$list-text-line-height: 1.4;
+.dashboard-list {
+    background: $dashboard-list-bg-color;
+    left: 0;
+    width: $dashboard-list-width;
+    overflow: hidden;
+    & + .dashboard-content {
+        left: $dashboard-list-width;
+        width: $dashboard-content-width;
+    }
+    .list-view {
+        overflow-y: scroll;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+    .item {
+        width: 100%;
+        padding: 10px 15px;
+        border-bottom: 1px solid #E0E0E0;
+        background: $dashboard-list-bg-color;
+        @include box-shadow(-14px 0 20px rgba(0, 0, 0, 0.05) inset);
+        @include transition(background 200ms linear, box-shadow 200ms linear);
+        .title {
+            font-size: 18px;
+            line-height: 32px;
+            font-weight: 500;
+            text-decoration: none;
+            color: black;
+            cursor: pointer;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: 0;
+        }
+        .text {
+            display: block;
+            /* Fallback for non-webkit */
+            display: -webkit-box;
+            max-width: 100%;
+            font-size: $list-text-font-size;
+            margin: 0 auto;
+            line-height: $list-text-line-height;
+            height: $list-text-font-size * $list-text-line-height * $list-text-lines;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -webkit-line-clamp: $list-text-lines;
+            -webkit-box-orient: vertical;
+        }
+        .text-muted {
+            font-size: 12px;
+            margin: 0;
+        }
+    }
+    .item.selected {
+        background: white;
+        @include box-shadow(none);
+    }
+}
+
+.dashboard-main {
+    left: $dashboard-menu-width;
+    width: $dashboard-main-width;
+}
+
+.dashboard-content {
+    left: 0;
+    width: 100%;
+}
+
+#search-collapse {
+    position: absolute;
+    background: white;
+    width: 100%;
+    padding: 20px;
+    border-right: 1px solid #F0F0F0;
+    border-bottom: 1px solid #F0F0F0;
+    @include border-bottom-radius(5px);
+}
+
+
+/**------------------------------------------
+ *              Menu Sidebar
+ ------------------------------------------*/
+
+$sidebar-color: RGB(136, 157, 169);
+$sidebar-opened-border-color: RGB(85, 164, 211);
+$sidebar-submenu-hover-bg-color: RGB(44, 52, 55);
+.aurora-sidebar .nav>li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    @include transition(border 200ms linear, box-shadow 200ms ease-out);
+    & > a {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: $sidebar-color;
+        padding: 1.3em 20px;
+        &:focus,
+        &:hover {
+            color: white;
+            text-decoration: none;
+            background-color: transparent;
+        }
+        &.selected {
+            @include box-shadow(0 4px 4px rgba(0, 0, 0, 0.25) inset);
+            border-left: 3px solid $sidebar-opened-border-color;
+        }
+    }
+    & > i.fa {
+        position: absolute;
+        right: 1.8em;
+        top: 1.55em;
+        color: $sidebar-color;
+        @include transition(all 300ms linear);
+    }
+    &.opened {
+        border-left: 3px solid $sidebar-opened-border-color;
+        @include box-shadow(0 4px 4px rgba(0, 0, 0, 0.25) inset, 0 -4px 4px rgba(0, 0, 0, 0.25) inset);
+        & > i.fa {
+            @include rotate(90deg);
+        }
+    }
+}
+
+.aurora-sidebar .nav .submenu {
+    &,
+    & > li {
+        padding: 0;
+    }
+    & > li > a {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: white;
+        padding: 1.3em 20px;
+        padding-left: 3.3em;
+        text-decoration: none;
+        position: relative;
+        &:focus,
+        &:hover,
+        &.selected {
+            background: $sidebar-submenu-hover-bg-color;
+        }
+        &.selected {
+            @include box-shadow(0 2px 2px rgba(0, 0, 0, 0.25), 0 -2px 2px rgba(0, 0, 0, 0.25));
+        }
+        &.selected:before {
+            content: ' ';
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            left: 1em;
+            top: 1.6em;
+            border-radius: 50%;
+            background: RGB(103, 159, 23);
+        }
+    }
+}
