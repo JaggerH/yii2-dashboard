@@ -19,4 +19,9 @@ class DefaultController extends \yii\web\Controller
     {
         return $this->render('index');
     }
+
+    public function actionOverview()
+    {
+        return $this->renderPartial('overview');
+    }
 }

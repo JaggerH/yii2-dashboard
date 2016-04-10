@@ -1,4 +1,4 @@
-<?php
+    <?php
 use jackh\aurora\SideBar;
 ?>
 <div class="dashboard-menu">
@@ -10,8 +10,9 @@ use jackh\aurora\SideBar;
         "首页" => [
             "options" => [
                 "data-load" => "#dashboard-content",
-                // "data-url"  => "#",
+                "data-url"  => "/dashboard/default/overview",
                 "class"     => "selected",
+                "expanded"  => "true",
             ],
         ],
         "新闻" => [
@@ -50,8 +51,8 @@ use jackh\aurora\SideBar;
 ]);
 ?>
 </div>
-<div class="dashboard-main">
-    <!-- <div class="dashboard-list" id="dashboard-list"></div> -->
+<div class="dashboard-main"  expanded="true">
+    <div class="dashboard-list" id="dashboard-list"></div>
     <div class="dashboard-content">
         <div class="dashboard-header">
             <div class="toolbar pull-right">

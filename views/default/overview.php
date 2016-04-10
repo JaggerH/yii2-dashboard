@@ -35,7 +35,7 @@ $disk   = $system->disk_usage();
 <?=ChartJs::widget([
     'type'          => 'Doughnut',
     'options'       => [
-        'style' => "width: 150px; height: 150px",
+        'style' => "width: 233px; height: 233px",
         'id'    => 'disk',
     ],
     'clientOptions' => [

@@ -85,10 +85,6 @@ $list-text-line-height: 1.4;
     left: 0;
     width: $dashboard-list-width;
     overflow: hidden;
-    & + .dashboard-content {
-        left: $dashboard-list-width;
-        width: $dashboard-content-width;
-    }
     .list-view {
         overflow-y: scroll;
         &::-webkit-scrollbar {
@@ -143,8 +139,26 @@ $list-text-line-height: 1.4;
 .dashboard-main {
     left: $dashboard-menu-width;
     width: $dashboard-main-width;
+    .dashboard-list {
+        width: $dashboard-list-width;
+        @include transition(width 300ms linear);
+    }
+    .dashboard-content {
+        left: $dashboard-list-width;
+        width: $dashboard-content-width;
+        @include transition(left 300ms linear, width 300ms linear);
+    }
 }
 
+.dashboard-main[expanded="true"] { 
+    .dashboard-list {
+        width: 0;
+    }
+    .dashboard-content {
+        left: 0;
+        width: 100%;
+    }
+}
 .dashboard-content {
     left: 0;
     width: 100%;
@@ -162,6 +176,34 @@ $list-text-line-height: 1.4;
 
 
 /**------------------------------------------
+ *              Doughnut
+ ------------------------------------------*/
+
+.doughnut-legend {
+    list-style: none;
+    -webkit-padding-start: 0;
+    li {
+        display: block;
+        position: relative;
+        margin-bottom: 4px;
+        border-radius: 5px;
+        padding: 2px 8px 2px 28px;
+        font-size: 14px;
+        cursor: default;
+        span {
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 25px;
+            height: 100%;
+            border-radius: 5px;
+        }
+    }
+}
+
+
+/**------------------------------------------
  *              Menu Sidebar
  ------------------------------------------*/
 
@@ -170,7 +212,7 @@ $sidebar-opened-border-color: RGB(85, 164, 211);
 $sidebar-submenu-hover-bg-color: RGB(44, 52, 55);
 .aurora-sidebar .nav>li {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    @include transition(border 200ms linear, box-shadow 200ms ease-out);
+    @include transition(border 400ms ease-out, box-shadow 200ms ease-out);
     & > a {
         display: block;
         font-size: 14px;
