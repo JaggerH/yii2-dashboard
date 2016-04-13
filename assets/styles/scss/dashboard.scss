@@ -65,11 +65,22 @@ $dashboard-header-toolbar-hover-color: #23527c;
             &:focus {
                 color: $dashboard-header-toolbar-hover-color;
             }
-            .fa {
+            & > .fa {
                 font-size: 20px;
             }
         }
+        .multi-choose {
+            padding: 25px 0;
+            float: left;
+            margin-left: -5px;
+            margin-right: 5px;
+            display: inline-block;
+        }
     }
+}
+
+.dashboard-list .dashboard-header {
+    padding: 0 10px;
 }
 
 .dashboard-content .dashboard-header {
@@ -96,8 +107,13 @@ $list-text-line-height: 1.4;
         padding: 10px 15px;
         border-bottom: 1px solid #E0E0E0;
         background: $dashboard-list-bg-color;
+        position: relative;
         @include box-shadow(-14px 0 20px rgba(0, 0, 0, 0.05) inset);
         @include transition(background 200ms linear, box-shadow 200ms linear);
+        .content {
+            margin-left: 0;
+            @include transition(margin 200ms linear);
+        }
         .title {
             font-size: 18px;
             line-height: 32px;
@@ -129,6 +145,18 @@ $list-text-line-height: 1.4;
             font-size: 12px;
             margin: 0;
         }
+        .multi-choose {
+            top: 0;
+            bottom: 0;
+            position: absolute;
+            left: 5px;
+            margin: auto;
+            width: 20px;
+            height: 20px;
+            & + .content {
+                margin-left: 20px;
+            }
+        }
     }
     .item.selected {
         background: white;
@@ -150,7 +178,7 @@ $list-text-line-height: 1.4;
     }
 }
 
-.dashboard-main[expanded="true"] { 
+.dashboard-main[expanded="true"] {
     .dashboard-list {
         width: 0;
     }
@@ -159,6 +187,7 @@ $list-text-line-height: 1.4;
         width: 100%;
     }
 }
+
 .dashboard-content {
     left: 0;
     width: 100%;
@@ -171,9 +200,33 @@ $list-text-line-height: 1.4;
     padding: 20px;
     border-right: 1px solid #F0F0F0;
     border-bottom: 1px solid #F0F0F0;
+    z-index: 1;
     @include border-bottom-radius(5px);
 }
 
+#dashboard-tips-handler {
+    width: 100%;
+    position: absolute;
+    top: 72px;
+}
+
+.dashboard-tips {
+    padding-left: 2em;
+    line-height: 50px;
+    font-size: 16px;
+}
+
+.tips-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+.tips-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
 
 /**------------------------------------------
  *              Doughnut
@@ -212,7 +265,7 @@ $sidebar-opened-border-color: RGB(85, 164, 211);
 $sidebar-submenu-hover-bg-color: RGB(44, 52, 55);
 .aurora-sidebar .nav>li {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    @include transition(border 400ms ease-out, box-shadow 200ms ease-out);
+    @include transition(border 100ms linear, box-shadow 200ms ease-out);
     & > a {
         display: block;
         font-size: 14px;

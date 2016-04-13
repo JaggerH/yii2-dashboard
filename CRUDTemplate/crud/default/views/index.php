@@ -24,6 +24,9 @@ use <?=$generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\wi
 <div class="<?=Inflector::camel2id(StringHelper::basename($generator->modelClass))?>-index">
 
 <div class="dashboard-header">
+    <a class="toolbar" multi-choose-mode>
+        <i class="fa fa-check-square-o"></i>
+    </a>
     <?="<?php"?> if($searchModel->searched) <?="{?>\n";?>
     <a class="toolbar" action-bk2bsearch="" style="margin-right: 10px">
         <i class="fa fa-chevron-left"></i>
@@ -83,11 +86,11 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
         'itemView' => function ($model, $key, $index, $widget) {
             $widget->itemOptions = array_merge($widget->itemOptions, [
                 "data-url"  => Url::toRoute(['update', 'id' => $model->id]),
+                "data-delete-url"  => Url::toRoute(['delete', 'id' => $model->id]),
                 "data-load" => "#dashboard-content",
             ]);
-            return Html::tag("p", Html::encode($model->title), [
-                "class" => "title",
-            ]);
+            $title = Html::tag("p", Html::encode($model->title), ["class" => "title"]);
+            return Html::tag("div", $title, ["class" => "content"]);
         },
         'pager'        => [
             'linkOptions' => ["data-load" => "#dashboard-list"],

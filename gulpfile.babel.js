@@ -84,7 +84,7 @@ gulp.task('extras', () => {
   }).pipe(gulp.dest('dist'));
 });
 
-gulp.task('clean', del.bind(null, ['assets/styles/dashboard.css']));
+gulp.task('clean', del(['assets/styles/dashboard.css', '../yii2/web/assets/*'], {force: true}));
 
 gulp.task('serve', ['styles'], () => {
   gulp.watch('assets/styles/**/*.scss', ['styles']);

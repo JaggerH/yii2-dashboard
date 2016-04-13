@@ -12,17 +12,26 @@ $(document).ready(function() {
 
     // .submenu的data-load，点击后添加selected
     $('#menu-sidebar .submenu [data-load]').click(function() {
+        if ($(this).data('load') == "#dashboard-list") {
+            $("#dashboard-content").html('')
+        }
         $('#menu-sidebar [data-load].selected').removeClass("selected")
         $(this).addClass("selected")
     })
 
     // 主menu的data-load，点击后关闭其他展开的二级菜单，添加当前选项的selected
     $('#menu-sidebar > ul > li > [data-load]').click(function() {
+        if ($(this).data('load') == "#dashboard-list") {
+            $("#dashboard-content").html('')
+        }
         $('#menu-sidebar [data-load].selected').removeClass("selected")
         $('#menu-sidebar [aria-expanded="true"]').click()
         $(this).addClass("selected")
     })
 
+    /**------------------------------------------
+     *       Dashboard List Controller
+     ------------------------------------------*/
     $(document).on('click', '#dashboard-list .item[data-load]', function() {
         $('#dashboard-list .item[data-load]').removeClass('selected')
         $(this).addClass('selected')
@@ -33,6 +42,20 @@ $(document).ready(function() {
      *       Dashboard Navigation Controller
      ------------------------------------------*/
 
+    function MessageTips(response) {
+        $tips = $('<div class="dashboard-tips"></div>')
+        if (response.code == 29999) {
+            $tips.addClass("tips-success")
+        } else {
+            $tips.addClass("tips-danger")
+        }
+        $tips.text(response.message)
+        $('#dashboard-tips-handler').html($tips).collapse('show')
+        setTimeout(function() {
+            $('#dashboard-tips-handler').collapse('hide')
+        }, 2000)
+    }
+
     function dataLoad($target, that, method, url, data, params) {
         var params = $.extend(params, { _relativeTarget: that, url: url }),
             $loadingTip = $('<div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 40px; height: 40px; margin: auto;"> <i class="fa fa-spinner fa-spin" style="font-size: 40px; "></i></div>')
@@ -40,24 +63,47 @@ $(document).ready(function() {
         var _loadEvent = $.Event('_load.dashboard', params)
         $target.trigger(_loadEvent)
 
-        $target.html('')
-        if ($target.attr('id') == "dashboard-list") {
-            $("#dashboard-content").html('')
+        // 如果是create||update，不显示正在加载的图标
+        if (params && !/\/\w+[\w+-]*\/(create|update)/.test(url)) {
+            $target.html('').append($loadingTip)
         }
-        $loadingTip.appendTo($target)
 
         $.ajax({
                 url: url,
                 type: method,
                 data: data
             })
-            .success(function(data) {
-                $target.html(data)
+            .success(function(response) {
+                if (params && params.form_submit == "create") {
+                    url = url.replace("/create", "/update") + "?id=" + response.data.id
+                    dataLoad($target, that, 'get', url, null, null)
+                    listReload(response.data.id)
+                    MessageTips(response)
+                } else if (params && params.form_submit == "update") {
+                    var id = url.match(/\?id=(.*)/)[1]
+                    MessageTips(response)
+                    listReload(id)
+                } else {
+                    $target.html(response)
+                }
             })
             .done(function(data) {
-                var load_Event = $.Event('load_.dashboard', params)
+                var load_Event = $.Event('load_.dashboard', $.extend(params, { data: data }))
                 $target.trigger(load_Event)
             })
+    }
+
+    function listReload(active_key) {
+        var url = $('#dashboard-list').attr('current-url')
+
+        function select() {
+            $('#dashboard-list').off('load_.dashboard.reload')
+            $('#dashboard-list .item[data-key="' + active_key + '"]').addClass('selected')
+        }
+        if (active_key != "null") {
+            $('#dashboard-list').on('load_.dashboard.reload', select)
+        }
+        dataLoad($('#dashboard-list'), null, 'get', url, null, null)
     }
 
     $(document).on('click', '[data-load]', function(e) {
@@ -85,29 +131,37 @@ $(document).ready(function() {
         var data = {},
             url = $(this).attr("action"),
             method = $(this).attr("method"),
-            $target = $($(this).data("load")),
-            $loadingTip = $('<div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 40px; height: 40px; margin: auto;"> <i class="fa fa-spinner fa-spin" style="font-size: 40px; "></i></div>')
-
-        $target.html('')
+            $target = $($(this).data("load"))
 
         $(this).find('input[type="text"], input[type="password"]').each(function() {
             data[$(this).attr("name")] = $(this).val()
         })
 
-        dataLoad($target, this, method, url, data, {form_submit: true})
+        $(this).find('textarea').each(function() {
+            data[$(this).attr("name")] = $(this).val()
+        })
+
+        if (/\/\w+[\w+-]*\/index/.test(url)) {
+            dataLoad($target, this, method, url, data, { form_submit: "search" })
+        } else if (/\/\w+[\w+-]*\/create/.test(url)) {
+            dataLoad($('#dashboard-content'), this, method, url, data, { form_submit: "create" })
+        } else if (/\/\w+[\w+-]*\/update/.test(url)) {
+            dataLoad($('#dashboard-content'), this, method, url, data, { form_submit: "update" })
+        }
     })
 
     /**------------------------------------------
-     *       Dashboard back to before search handler
+     *  Dashboard back to before search handler
      ------------------------------------------*/
     // 对待search事件，在加载之前需要设定一个可读取的before-search url, 加载后为其添加data-load属性
     $(document).on('_load.dashboard', '#dashboard-list', function(e) {
-        //如果是由form_submit触发的load事件并且含有index的url，那么这是一个search事件
-        if (typeof e.form_submit != 'undefined' && e.form_submit && /\/\w+[\w+-]*\/index/.test(e.url)) {
-            var before_url = $(this).attr('before-search')
-            if (typeof before_url == 'undefined' || before_url == '') {
-                before_url = $(this).attr('current-url')
-                $(this).attr('before-search', before_url)
+        if (typeof e.form_submit != 'undefined') {
+            if (e.form_submit == "search") {
+                var before_url = $(this).attr('before-search')
+                if (typeof before_url == 'undefined' || before_url == '') {
+                    before_url = $(this).attr('current-url')
+                    $(this).attr('before-search', before_url)
+                }
             }
         } else {
             $(this).attr('current-url', e.url)
@@ -115,12 +169,71 @@ $(document).ready(function() {
     })
 
     $(document).on('load_.dashboard', '#dashboard-list', function(e) {
-        // 如果是由form_submit触发的load事件并且含有index的url，那么这是一个search事件
-        if (typeof e.form_submit != 'undefined' && e.form_submit && /\/\w+[\w+-]*\/index/.test(e.url)) {
-            var before_url = $(this).attr('before-search')
-            $('#dashboard-list [action-bk2bsearch]').attr('data-load', '#dashboard-list')
+        if (typeof e.form_submit != 'undefined') {
+            if (e.form_submit == "search") {
+                var before_url = $(this).attr('before-search')
+                $('#dashboard-list [action-bk2bsearch]').attr('data-load', '#dashboard-list')
                     .attr('data-url', before_url)
+            }
         }
+    })
+
+    /**------------------------------------------
+     *  Dashboard Delete handler
+     ------------------------------------------*/
+    var origin_header;
+    $(document).on('click.dashboard', '#dashboard-list .toolbar[multi-choose-mode]', function(e) {
+        // 移除并保存原有dashboard-header
+        // 注入新的dashboard-header
+        // 为dashboard-list .item 添加多选按钮
+        var $header = $('#dashboard-list .dashboard-header'),
+            $items = $('#dashboard-list .list-view > .item')
+        origin_header = $header.children().detach()
+        $header.append('<a class="multi-choose" multi-choose> <div class="checkbox" data-toggle="checkbox" style="margin: 0;"> <input type="checkbox" name="role" value="ChooseAll"> <div class="checkbox-label"><i class="fa fa-check"></i></div> </div> </a>')
+            .append('<a class="toolbar pull-right" cancel-multi-choose> <i class="fa fa-arrow-right"></i> </a>')
+            .append('<a class="toolbar pull-right" multi-delete> <i class="fa fa-trash-o"></i> </a>')
+
+        $items.each(function() {
+            $(this).prepend('<a class="multi-choose"> <div class="checkbox" data-toggle="checkbox" style="margin: 0;"> <input type="checkbox" name="role"> <div class="checkbox-label"><i class="fa fa-check"></i></div> </div> </a>')
+        })
+    })
+
+    $(document).on('click.dashboard', '#dashboard-list .toolbar[cancel-multi-choose]', function(e) {
+        var $header = $('#dashboard-list .dashboard-header'),
+            $items_choose = $('#dashboard-list .list-view > .item > .multi-choose')
+
+        $header.children().remove()
+        origin_header.each(function(index, el) {
+            $(this).appendTo($header)
+        })
+        $items_choose.remove()
+    })
+
+    $(document).on('click.dashboard', '#dashboard-list .dashboard-header > [multi-choose]', function(e) {
+        var status = $(this).find('[type="checkbox"]')[0].checked,
+            toggle = status ? "on" : "off"
+        $('#dashboard-list .list-view > .item > .multi-choose > .checkbox').checkbox(toggle)
+    })
+
+    $(document).on('click.dashboard', '#dashboard-list .dashboard-header > [multi-delete]', function(e) {
+
+        $('#dashboard-list .list-view > .item > .multi-choose > .checkbox').each(function() {
+            var checked = $(this).find('[type="checkbox"]')[0].checked
+            if (checked) {
+                var delete_url = $(this).parents('.item').data('delete-url')
+                $.post(delete_url)
+            }
+        })
+        setTimeout(function() {
+            // reload after delete
+            var url = $('#dashboard-list').attr('current-url')
+            dataLoad($('#dashboard-list'), this, 'get', url, null)
+
+        }, 500)
+    })
+
+    $(document).on('click.dashboard', '#dashboard-list .item > .multi-choose', function(e) {
+        e.stopPropagation()
     })
 
     /**------------------------------------------

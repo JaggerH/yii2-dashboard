@@ -103,7 +103,17 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
         $model = new <?=$modelClass?>();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', <?=$urlParams?>]);
+            return \Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'message' => Yii::t('app', "Create Success!"),
+                    'code' => 29999,
+                    'data' => [
+                        'id' => $model-><?=trim($actionParams, "$")?>
+                    ],
+                ],
+            ]);
         } else {
             return $this->renderPartial('create', [
                 'model' => $model,
@@ -122,7 +132,14 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
         $model = $this->findModel(<?=$actionParams?>);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', <?=$urlParams?>]);
+            return \Yii::createObject([
+                'class' => 'yii\web\Response',
+                'format' => \yii\web\Response::FORMAT_JSON,
+                'data' => [
+                    'message' => Yii::t('app', "Update Success!"),
+                    'code' => 29999,
+                ],
+            ]);
         } else {
             return $this->renderPartial('update', [
                 'model' => $model,
@@ -139,8 +156,6 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
     public function actionDelete(<?=$actionParams?>)
     {
         $this->findModel(<?=$actionParams?>)->delete();
-
-        return $this->redirect(['index']);
     }
 
     /**

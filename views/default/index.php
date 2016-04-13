@@ -59,6 +59,7 @@ use jackh\aurora\SideBar;
                 <i class="fa fa-sign-out"></i>
             </div>
         </div>
+        <div class="collapse" aria-expanded="false" id="dashboard-tips-handler"></div>
         <div id="dashboard-content">
             <?=$this->render('overview');?>
         </div>

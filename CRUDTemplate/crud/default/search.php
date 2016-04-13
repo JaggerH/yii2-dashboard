@@ -65,7 +65,7 @@ class <?=$searchModelClass?> extends <?=isset($modelAlias) ? $modelAlias : $mode
      */
     public function search($params)
     {
-        $query = <?=isset($modelAlias) ? $modelAlias : $modelClass?>::find();
+        $query = <?=isset($modelAlias) ? $modelAlias : $modelClass?>::find()->orderBy('id desc');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
