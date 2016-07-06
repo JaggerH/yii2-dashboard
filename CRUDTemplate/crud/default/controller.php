@@ -43,6 +43,9 @@ use yii\filters\VerbFilter;
  */
 class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseControllerClass) . "\n"?>
 {
+
+    public $layout = '@jackh/dashboard/views/layouts/partial.php';
+
     public function behaviors()
     {
         return [
@@ -66,7 +69,7 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         $dataProvider->setPagination(["pageSize" => 15]);
 
-        return $this->renderPartial('index', [
+        return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -75,7 +78,7 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
             'query' => <?=$modelClass?>::find(),
         ]);
 
-        return $this->renderPartial('index', [
+        return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
 <?php endif;?>
@@ -88,7 +91,7 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
      */
     public function actionView(<?=$actionParams?>)
     {
-        return $this->renderPartial('view', [
+        return $this->render('view', [
             'model' => $this->findModel(<?=$actionParams?>),
         ]);
     }
@@ -115,7 +118,7 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
                 ],
             ]);
         } else {
-            return $this->renderPartial('create', [
+            return $this->render('create', [
                 'model' => $model,
             ]);
         }
@@ -141,7 +144,7 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
                 ],
             ]);
         } else {
-            return $this->renderPartial('update', [
+            return $this->render('update', [
                 'model' => $model,
             ]);
         }

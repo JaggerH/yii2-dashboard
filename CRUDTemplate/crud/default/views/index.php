@@ -12,6 +12,7 @@ $nameAttribute = $generator->getNameAttribute();
 echo "<?php\n";
 ?>
 
+use jackh\admin\components\Helper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use <?=$generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\widgets\\ListView"?>;
@@ -24,21 +25,27 @@ use <?=$generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\wi
 <div class="<?=Inflector::camel2id(StringHelper::basename($generator->modelClass))?>-index">
 
 <div class="dashboard-header">
+<?php $module_name = Inflector::camel2id(StringHelper::basename($generator->modelClass));?>
+<?='    <?php if (Helper::checkRoute("/' . $module_name . '/delete")) {?>' . "\n"?>
     <a class="toolbar" multi-choose-mode>
         <i class="fa fa-check-square-o"></i>
     </a>
+<?='    <?php } ?>' . "\n"?>
     <?="<?php"?> if($searchModel->searched) <?="{?>\n";?>
     <a class="toolbar" action-bk2bsearch="" style="margin-right: 10px">
         <i class="fa fa-chevron-left"></i>
     </a>
-    <?="<?php"?> } <?="?>"?>
+    <?="<?php"?> } <?="?>" . "\n"?>
 
     <a class="toolbar" data-toggle="collapse" data-target="#search-collapse">
         <i class="fa fa-search"></i>
     </a>
+
+<?='    <?php if (Helper::checkRoute("/' . $module_name . '/create")) {?>' . "\n"?>
     <a class="toolbar pull-right" data-load="#dashboard-content" data-url="<?="/" . Inflector::camel2id(StringHelper::basename($generator->modelClass)) . "/create";?>">
         <i class="fa fa-plus"></i>
     </a>
+<?='    <?php } ?>' . "\n"?>
 </div>
 <?php if (!empty($generator->searchModelClass)): ?>
 <div class="collapse" id="search-collapse">

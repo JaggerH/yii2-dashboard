@@ -44,7 +44,7 @@ $(document).ready(function() {
 
     function MessageTips(response) {
         $tips = $('<div class="dashboard-tips"></div>')
-        if (response.code == 29999) {
+        if (response.success) {
             $tips.addClass("tips-success")
         } else {
             $tips.addClass("tips-danger")
@@ -75,16 +75,33 @@ $(document).ready(function() {
             })
             .success(function(response) {
                 if (params && params.form_submit == "create") {
-                    url = url.replace("/create", "/update") + "?id=" + response.data.id
-                    dataLoad($target, that, 'get', url, null, null)
-                    listReload(response.data.id)
-                    MessageTips(response)
+                    if (typeof response == "object") {
+                        url = url.replace("/create", "/update") + "?id=" + response.data.id
+                        dataLoad($target, that, 'get', url, null, null)
+                        listReload(response.data.id)
+                        MessageTips(response)
+                    } else {
+                        MessageTips({ message: 'Create Failed!', success: false })
+                        $target.html(response)
+                    }
                 } else if (params && params.form_submit == "update") {
                     var id = url.match(/\?id=(.*)/)[1]
-                    MessageTips(response)
-                    listReload(id)
+                    if (typeof response == "object") {
+                        listReload(id)
+                        MessageTips(response)
+                    } else {
+                        MessageTips({ message: 'Update Failed!', success: false })
+                        $target.html(response)
+                    }
                 } else {
                     $target.html(response)
+                }
+            })
+            .fail(function(response) {
+                if (response.status == 403) {
+                    $target.html('<div class="text-center" style="margin-top: 200px;"><i class="fa fa-ban" style="font-size: 60px"></i><h3>Permission Denied</h3></div>')
+                } else if (response.status == 404) {
+                    $target.html('<div class="text-center" style="margin-top: 200px;"><h1>404</h1><h3>The Page requested NOT FOUND</h3></div>')
                 }
             })
             .done(function(data) {
@@ -133,7 +150,7 @@ $(document).ready(function() {
             method = $(this).attr("method"),
             $target = $($(this).data("load"))
 
-        $(this).find('input[type="text"], input[type="password"]').each(function() {
+        $(this).find('input[type="text"], input[type="password"], input[type="hidden"]').each(function() {
             data[$(this).attr("name")] = $(this).val()
         })
 
@@ -216,20 +233,32 @@ $(document).ready(function() {
     })
 
     $(document).on('click.dashboard', '#dashboard-list .dashboard-header > [multi-delete]', function(e) {
+        $(this).confirm({
+            confirm: function() {
+                var finish_delete = false
 
-        $('#dashboard-list .list-view > .item > .multi-choose > .checkbox').each(function() {
-            var checked = $(this).find('[type="checkbox"]')[0].checked
-            if (checked) {
-                var delete_url = $(this).parents('.item').data('delete-url')
-                $.post(delete_url)
+                    !(function() {
+                    $('#dashboard-list .list-view > .item > .multi-choose > .checkbox').each(function() {
+                        var checked = $(this).find('[type="checkbox"]')[0].checked
+                        if (checked) {
+                            var delete_url = $(this).parents('.item').data('delete-url')
+                            $.post(delete_url)
+                        }
+                    })
+                    finish_delete = true
+                })()
+
+                var refresh = setInterval(function() {
+                    // reload after delete
+                    if (finish_delete) {
+                        var url = $('#dashboard-list').attr('current-url')
+                        dataLoad($('#dashboard-list'), this, 'get', url, null)
+                        clearInterval(refresh)
+                    }
+                }, 200)
             }
         })
-        setTimeout(function() {
-            // reload after delete
-            var url = $('#dashboard-list').attr('current-url')
-            dataLoad($('#dashboard-list'), this, 'get', url, null)
-
-        }, 500)
+        $(this).confirm('show')
     })
 
     $(document).on('click.dashboard', '#dashboard-list .item > .multi-choose', function(e) {
@@ -246,7 +275,11 @@ $(document).ready(function() {
             if ($this.is('#dashboard-list')) {
                 $this.find('.list-view').height($(window).height() - $this.find('.dashboard-header').height())
             } else {
-                $this.height($(window).height() - $this.siblings('.dashboard-header'))
+                $this.height($(window).height() - $this.siblings('.dashboard-header').height())
+                var $editor = $this.find('#quill-editor')
+                if ($editor) {
+                    $editor.height($(window).height() - $editor.offset().top - 30)
+                }
             }
         }
         resizeHeight()

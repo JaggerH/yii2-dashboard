@@ -15,6 +15,13 @@ $dashboard-banner-bg: RGB(85, 164, 211);
 $dashboard-header-height: 72px;
 $dashboard-header-toolbar-color: RGB(92, 101, 125);
 $dashboard-header-toolbar-hover-color: #23527c;
+$dashboard-header-border: 1px solid RGB(179, 179, 183);
+$dashboard-list-bg-color: RGB(245, 245, 245);
+$list-text-lines: 2;
+$list-text-font-size: 14px;
+$list-text-line-height: 1.4;
+$dashboard-list-selected-bg: RGB(139, 139, 145);
+
 .dashboard-menu,
 .dashboard-main,
 .dashboard-list,
@@ -51,8 +58,9 @@ $dashboard-header-toolbar-hover-color: #23527c;
     .dashboard-header {
         width: 100%;
         height: $dashboard-header-height;
-        @include box-shadow(0px 14px 20px rgba(0, 0, 0, 0.05));
         padding: 0 20px;
+        border-bottom: $dashboard-header-border;
+        background: $dashboard-list-bg-color;
         .toolbar {
             line-height: $dashboard-header-height;
             display: inline-block;
@@ -83,16 +91,11 @@ $dashboard-header-toolbar-hover-color: #23527c;
     padding: 0 10px;
 }
 
-.dashboard-content .dashboard-header {
-    background: white;
+.dashboard-content {
+    border-left: $dashboard-header-border;
 }
 
-$dashboard-list-bg-color: RGB(244, 245, 249);
-$list-text-lines: 2;
-$list-text-font-size: 14px;
-$list-text-line-height: 1.4;
 .dashboard-list {
-    background: $dashboard-list-bg-color;
     left: 0;
     width: $dashboard-list-width;
     overflow: hidden;
@@ -106,16 +109,14 @@ $list-text-line-height: 1.4;
         width: 100%;
         padding: 10px 15px;
         border-bottom: 1px solid #E0E0E0;
-        background: $dashboard-list-bg-color;
+        background: white;
         position: relative;
-        @include box-shadow(-14px 0 20px rgba(0, 0, 0, 0.05) inset);
-        @include transition(background 200ms linear, box-shadow 200ms linear);
         .content {
             margin-left: 0;
             @include transition(margin 200ms linear);
         }
         .title {
-            font-size: 18px;
+            font-size: 16px;
             line-height: 32px;
             font-weight: 500;
             text-decoration: none;
@@ -129,6 +130,7 @@ $list-text-line-height: 1.4;
         }
         .text {
             display: block;
+            font-size: 14px;
             /* Fallback for non-webkit */
             display: -webkit-box;
             max-width: 100%;
@@ -159,8 +161,10 @@ $list-text-line-height: 1.4;
         }
     }
     .item.selected {
-        background: white;
-        @include box-shadow(none);
+        background: $dashboard-list-selected-bg;
+        .title, .text, .text-muted, .checkbox .fa {
+            color: white;
+        }
     }
 }
 
@@ -228,6 +232,12 @@ $list-text-line-height: 1.4;
     border-color: #ebccd1;
 }
 
+
+.ql-container {
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
 /**------------------------------------------
  *              Doughnut
  ------------------------------------------*/
@@ -309,7 +319,7 @@ $sidebar-submenu-hover-bg-color: RGB(44, 52, 55);
         font-size: 14px;
         font-weight: 500;
         color: white;
-        padding: 1.3em 20px;
+        padding: 0.8em 20px;
         padding-left: 3.3em;
         text-decoration: none;
         position: relative;
@@ -327,7 +337,7 @@ $sidebar-submenu-hover-bg-color: RGB(44, 52, 55);
             height: 10px;
             position: absolute;
             left: 1em;
-            top: 1.6em;
+            top: 1.12em;
             border-radius: 50%;
             background: RGB(103, 159, 23);
         }

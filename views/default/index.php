@@ -7,7 +7,7 @@ use jackh\aurora\SideBar;
     </div>
 <?=SideBar::widget([
     "column"  => [
-        "首页" => [
+        "首页"   => [
             "options" => [
                 "data-load" => "#dashboard-content",
                 "data-url"  => "/dashboard/default/overview",
@@ -15,7 +15,7 @@ use jackh\aurora\SideBar;
                 "expanded"  => "true",
             ],
         ],
-        "新闻" => [
+        "新闻"   => [
             "submenu" => [
                 "企业新闻" => [
                     "data-load" => "#dashboard-list",
@@ -27,19 +27,24 @@ use jackh\aurora\SideBar;
                 ],
             ],
         ],
-        "按钮" => [
+        "权限管理" => [
             "submenu" => [
-                "按钮尺寸"  => [
+                "用户授权" => [
                     "data-load" => "#dashboard-list",
-                    "data-url"  => "/news/index",
+                    "data-url"  => "/admin/assignment",
                 ],
-                "按钮尺寸1" => [
+                "角色权限" => [
                     "data-load" => "#dashboard-list",
-                    "data-url"  => "/news/index",
+                    "data-url"  => "/admin/role",
                 ],
-                "按钮尺寸2" => [
+                "权限编辑" => [
                     "data-load" => "#dashboard-list",
-                    "data-url"  => "/news/index",
+                    "data-url"  => "/admin/permission",
+                ],
+                "路径权限" => [
+                    "data-load" => "#dashboard-content",
+                    "data-url"  => "/admin/route",
+                    "expanded"  => "true",
                 ],
             ],
         ],
