@@ -268,28 +268,28 @@ $(document).ready(function() {
     /**------------------------------------------
      *       Dashboard resize listen
      ------------------------------------------*/
-    $(document).on('load_.dashboard', '#dashboard-list, #dashboard-content', function(e) {
-        var $this = $(this)
+    // $(document).on('load_.dashboard', '#dashboard-list, #dashboard-content', function(e) {
+    //     var $this = $(this)
 
-        function resizeHeight() {
-            if ($this.is('#dashboard-list')) {
-                $this.find('.list-view').height($(window).height() - $this.find('.dashboard-header').height())
-            } else {
-                $this.height($(window).height() - $this.siblings('.dashboard-header').height())
-                var $editor = $this.find('#quill-editor')
-                if ($editor) {
-                    $editor.height($(window).height() - $editor.offset().top - 30)
-                }
-            }
-        }
-        resizeHeight()
-        $(window).on('resize.dashboard', function() {
-            resizeHeight()
-        })
-    })
+    //     function resizeHeight() {
+    //         if ($this.is('#dashboard-list')) {
+    //             $this.find('.list-view').height($(window).height() - $this.find('.dashboard-header').height())
+    //         } else {
+    //             $this.height($(window).height() - $this.siblings('.dashboard-header').height())
+    //             var $editor = $this.find('#quill-editor')
+    //             if ($editor) {
+    //                 $editor.height($(window).height() - $editor.offset().top - 30)
+    //             }
+    //         }
+    //     }
+    //     resizeHeight()
+    //     $(window).on('resize.dashboard', function() {
+    //         resizeHeight()
+    //     })
+    // })
 
-    $(document).on('_load.dashboard', '#dashboard-list, #dashboard-content', function(e) {
-        var $this = $(this)
-        $(window).off('resize.dashboard')
-    })
+    // $(document).on('_load.dashboard', '#dashboard-list, #dashboard-content', function(e) {
+    //     var $this = $(this)
+    //     $(window).off('resize.dashboard')
+    // })
 })

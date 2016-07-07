@@ -15,6 +15,8 @@ body {
 
 #dashboard-content {
   padding: 30px;
+  height: calc(100% - 72px);
+  overflow-y: scroll;
 }
 
 .dashboard-menu {
@@ -218,6 +220,7 @@ body {
   width: 100%;
   position: absolute;
   top: 72px;
+  z-index: 99;
 }
 
 .dashboard-tips {
@@ -273,6 +276,11 @@ body {
 /**------------------------------------------
  *              Menu Sidebar
  ------------------------------------------*/
+.aurora-sidebar {
+  height: calc(100% - 72px);
+  overflow-y: scroll;
+}
+
 .aurora-sidebar .nav > li {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   -webkit-transition: border 100ms linear, box-shadow 200ms ease-out;

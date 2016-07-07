@@ -6,7 +6,7 @@ use yii\helpers\StringHelper;
 /* @var $this yii\web\View */
 /* @var $generator yii\gii\generators\crud\Generator */
 
-$urlParams     = $generator->generateUrlParams();
+$urlParams = $generator->generateUrlParams();
 $nameAttribute = $generator->getNameAttribute();
 
 echo "<?php\n";
@@ -26,7 +26,7 @@ use <?=$generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\wi
 
 <div class="dashboard-header">
 <?php $module_name = Inflector::camel2id(StringHelper::basename($generator->modelClass));?>
-<?='    <?php if (Helper::checkRoute("/' . $module_name . '/delete")) {?>' . "\n"?>
+<?='    <?php if (Helper::checkRoute("' . $module_name . '/delete")) {?>' . "\n"?>
     <a class="toolbar" multi-choose-mode>
         <i class="fa fa-check-square-o"></i>
     </a>
@@ -41,8 +41,8 @@ use <?=$generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\wi
         <i class="fa fa-search"></i>
     </a>
 
-<?='    <?php if (Helper::checkRoute("/' . $module_name . '/create")) {?>' . "\n"?>
-    <a class="toolbar pull-right" data-load="#dashboard-content" data-url="<?="/" . Inflector::camel2id(StringHelper::basename($generator->modelClass)) . "/create";?>">
+<?='    <?php if (Helper::checkRoute("' . $module_name . '/create")) {?>' . "\n"?>
+    <a class="toolbar pull-right" data-load="#dashboard-content" data-url="<?=Inflector::camel2id(StringHelper::basename($generator->modelClass)) . "/create";?>">
         <i class="fa fa-plus"></i>
     </a>
 <?='    <?php } ?>' . "\n"?>
@@ -63,22 +63,22 @@ use <?=$generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\wi
 <?php
 $count = 0;
 if (($tableSchema = $generator->getTableSchema()) === false) {
-    foreach ($generator->getColumnNames() as $name) {
-        if (++$count < 6) {
-            echo "            '" . $name . "',\n";
-        } else {
-            echo "            // '" . $name . "',\n";
-        }
-    }
+	foreach ($generator->getColumnNames() as $name) {
+		if (++$count < 6) {
+			echo "            '" . $name . "',\n";
+		} else {
+			echo "            // '" . $name . "',\n";
+		}
+	}
 } else {
-    foreach ($tableSchema->columns as $column) {
-        $format = $generator->generateColumnFormat($column);
-        if (++$count < 6) {
-            echo "            '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
-        } else {
-            echo "            // '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
-        }
-    }
+	foreach ($tableSchema->columns as $column) {
+		$format = $generator->generateColumnFormat($column);
+		if (++$count < 6) {
+			echo "            '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
+		} else {
+			echo "            // '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
+		}
+	}
 }
 ?>
 
