@@ -115,7 +115,7 @@ use jackh\aurora\SideBar;
     <div class="dashboard-list" id="dashboard-list"></div>
     <div class="dashboard-content">
         <div class="dashboard-header">
-            <div class="toolbar pull-right">
+            <div class="toolbar pull-right" action-logout>
                 <i class="fa fa-sign-out"></i>
             </div>
         </div>

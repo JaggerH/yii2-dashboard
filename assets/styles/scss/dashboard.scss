@@ -237,6 +237,12 @@ $dashboard-list-selected-bg: RGB(139, 139, 145);
     border-color: #ebccd1;
 }
 
+.tips-warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+
 .ql-container {
     &::-webkit-scrollbar {
         display: none;
@@ -352,4 +358,8 @@ $sidebar-submenu-hover-bg-color: RGB(44, 52, 55);
             background: RGB(103, 159, 23);
         }
     }
+}
+
+*::-webkit-scrollbar {
+    display: none;
 }

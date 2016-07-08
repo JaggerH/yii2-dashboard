@@ -45,9 +45,11 @@ $(document).ready(function() {
     function MessageTips(response) {
         $tips = $('<div class="dashboard-tips"></div>')
         if (response.success) {
-            $tips.addClass("tips-success")
+            console.log(111)
+            $tips.removeClass("tips-danger").addClass("tips-success")
         } else {
-            $tips.addClass("tips-danger")
+            console.log(222)
+            $tips.removeClass("tips-success").addClass("tips-danger")
         }
         $tips.text(response.message)
         $('#dashboard-tips-handler').html($tips).collapse('show')
@@ -150,7 +152,7 @@ $(document).ready(function() {
             method = $(this).attr("method"),
             $target = $($(this).data("load"))
 
-        $(this).find('input[type="text"], input[type="password"], input[type="hidden"]').each(function() {
+        $(this).find('input[type="text"], input[type="password"], input[type="hidden"], select').each(function() {
             data[$(this).attr("name")] = $(this).val()
         })
 
@@ -263,6 +265,12 @@ $(document).ready(function() {
 
     $(document).on('click.dashboard', '#dashboard-list .item > .multi-choose', function(e) {
         e.stopPropagation()
+    })
+
+    $(document).on('click.dashboard', '[action-logout]', function(e) {
+        $.post('site/logout').done(function(e) {
+            window.location.path = '/dashboard'
+        })
     })
 
     /**------------------------------------------

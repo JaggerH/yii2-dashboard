@@ -8,18 +8,18 @@ use yii\helpers\StringHelper;
 /* @var $this yii\web\View */
 /* @var $generator yii\gii\generators\crud\Generator */
 
-$controllerClass  = StringHelper::basename($generator->controllerClass);
-$modelClass       = StringHelper::basename($generator->modelClass);
+$controllerClass = StringHelper::basename($generator->controllerClass);
+$modelClass = StringHelper::basename($generator->modelClass);
 $searchModelClass = StringHelper::basename($generator->searchModelClass);
 if ($modelClass === $searchModelClass) {
-    $searchModelAlias = $searchModelClass . 'Search';
+	$searchModelAlias = $searchModelClass . 'Search';
 }
 
 /* @var $class ActiveRecordInterface */
-$class               = $generator->modelClass;
-$pks                 = $class::primaryKey();
-$urlParams           = $generator->generateUrlParams();
-$actionParams        = $generator->generateActionParams();
+$class = $generator->modelClass;
+$pks = $class::primaryKey();
+$urlParams = $generator->generateUrlParams();
+$actionParams = $generator->generateActionParams();
 $actionParamComments = $generator->generateActionParamComments();
 
 echo "<?php\n";
@@ -111,7 +111,7 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
                 'format' => \yii\web\Response::FORMAT_JSON,
                 'data' => [
                     'message' => Yii::t('app', "Create Success!"),
-                    'code' => 29999,
+                    'success' => true,
                     'data' => [
                         'id' => $model-><?=trim($actionParams, "$")?>
                     ],
@@ -140,7 +140,7 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
                 'format' => \yii\web\Response::FORMAT_JSON,
                 'data' => [
                     'message' => Yii::t('app', "Update Success!"),
-                    'code' => 29999,
+                    'success' => true,
                 ],
             ]);
         } else {
@@ -172,13 +172,13 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
     {
 <?php
 if (count($pks) === 1) {
-    $condition = '$id';
+	$condition = '$id';
 } else {
-    $condition = [];
-    foreach ($pks as $pk) {
-        $condition[] = "'$pk' => \$$pk";
-    }
-    $condition = '[' . implode(', ', $condition) . ']';
+	$condition = [];
+	foreach ($pks as $pk) {
+		$condition[] = "'$pk' => \$$pk";
+	}
+	$condition = '[' . implode(', ', $condition) . ']';
 }
 ?>
         if (($model = <?=$modelClass?>::findOne(<?=$condition?>)) !== null) {
