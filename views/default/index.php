@@ -125,3 +125,10 @@ use jackh\aurora\SideBar;
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="dashboard-modal" tabindex="-1" role="dialog" aria-labelledby="dashboard-modal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    </div>
+  </div>
+</div>

@@ -45,10 +45,8 @@ $(document).ready(function() {
     function MessageTips(response) {
         $tips = $('<div class="dashboard-tips"></div>')
         if (response.success) {
-            console.log(111)
             $tips.removeClass("tips-danger").addClass("tips-success")
         } else {
-            console.log(222)
             $tips.removeClass("tips-success").addClass("tips-danger")
         }
         $tips.text(response.message)
@@ -60,14 +58,21 @@ $(document).ready(function() {
 
     function dataLoad($target, that, method, url, data, params) {
         var params = $.extend(params, { _relativeTarget: that, url: url }),
-            $loadingTip = $('<div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 40px; height: 40px; margin: auto;"> <i class="fa fa-spinner fa-spin" style="font-size: 40px; "></i></div>')
+            $loadingTip = $('<div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 40px; height: 40px; margin: auto;"> <i class="fa fa-spinner fa-spin" style="font-size: 40px; "></i></div>'),
+            _loadEvent = $.Event('_load.dashboard', params),
+            isModal = false
 
-        var _loadEvent = $.Event('_load.dashboard', params)
         $target.trigger(_loadEvent)
 
         // 如果是create||update，不显示正在加载的图标
         if (params && !/\/\w+[\w+-]*\/(create|update)/.test(url)) {
             $target.html('').append($loadingTip)
+        }
+
+        if ($target.attr('id') == 'dashboard-modal') {
+            isModal = true
+            $target.modal({ show: true })
+            $target = $target.find('.modal-content')
         }
 
         $.ajax({
@@ -79,20 +84,28 @@ $(document).ready(function() {
                 if (params && params.form_submit == "create") {
                     if (typeof response == "object") {
                         url = url.replace("/create", "/update") + "?id=" + response.data.id
-                        dataLoad($target, that, 'get', url, null, null)
-                        listReload(response.data.id)
-                        MessageTips(response)
+                        if (!isModal) {
+                            dataLoad($target, that, 'get', url, null, null)
+                            listReload(response.data.id)
+                            MessageTips(response)
+                        } else {
+                            $('#dashboard-modal').modal('hide')
+                        }
                     } else {
-                        MessageTips({ message: 'Create Failed!', success: false })
+                        if (!isModal) MessageTips({ message: 'Create Failed!', success: false })
                         $target.html(response)
                     }
                 } else if (params && params.form_submit == "update") {
                     var id = url.match(/\?id=(.*)/)[1]
                     if (typeof response == "object") {
-                        listReload(id)
-                        MessageTips(response)
+                        if (!isModal) {
+                            listReload(id)
+                            MessageTips(response)
+                        } else {
+                            $('#dashboard-modal').modal('hide')
+                        }
                     } else {
-                        MessageTips({ message: 'Update Failed!', success: false })
+                        if(!isModal) MessageTips({ message: 'Update Failed!', success: false })
                         $target.html(response)
                     }
                 } else {
@@ -129,8 +142,8 @@ $(document).ready(function() {
         // init 
         var url = $(this).data('url') == undefined ? $(this).attr('href') : $(this).data('url'),
             $target = $($(this).data('load')),
-            method = 'get'
-        if ($target.length == 0) return
+            method = $(this).attr('data-method') ? $(this).attr('data-method') : 'get'
+        if ($target.length == 0 && $(this).attr('data-load') != 'none') return
         if (url == undefined) return
 
         // 根据Menu中的expanded设置，为.dashboard-main添加属性以达到控制list, content宽度的目的
@@ -149,9 +162,14 @@ $(document).ready(function() {
         e.preventDefault()
         var data = {},
             url = $(this).attr("action"),
-            method = $(this).attr("method"),
-            $target = $($(this).data("load"))
+            method = $(this).attr("method")
 
+        if ($(this).parents('.dashboard-content').length != 0) {
+            $target = $('.dashboard-content')
+        }
+        if ($(this).parents('#dashboard-modal').length != 0) {
+            $target = $('#dashboard-modal')
+        }
         $(this).find('input[type="text"], input[type="password"], input[type="hidden"], select').each(function() {
             data[$(this).attr("name")] = $(this).val()
         })
@@ -163,9 +181,9 @@ $(document).ready(function() {
         if (/\/\w+[\w+-]*\/index/.test(url)) {
             dataLoad($target, this, method, url, data, { form_submit: "search" })
         } else if (/\/\w+[\w+-]*\/create/.test(url)) {
-            dataLoad($('#dashboard-content'), this, method, url, data, { form_submit: "create" })
+            dataLoad($target, this, method, url, data, { form_submit: "create" })
         } else if (/\/\w+[\w+-]*\/update/.test(url)) {
-            dataLoad($('#dashboard-content'), this, method, url, data, { form_submit: "update" })
+            dataLoad($target, this, method, url, data, { form_submit: "update" })
         }
     })
 
@@ -272,32 +290,4 @@ $(document).ready(function() {
             window.location.path = '/dashboard'
         })
     })
-
-    /**------------------------------------------
-     *       Dashboard resize listen
-     ------------------------------------------*/
-    // $(document).on('load_.dashboard', '#dashboard-list, #dashboard-content', function(e) {
-    //     var $this = $(this)
-
-    //     function resizeHeight() {
-    //         if ($this.is('#dashboard-list')) {
-    //             $this.find('.list-view').height($(window).height() - $this.find('.dashboard-header').height())
-    //         } else {
-    //             $this.height($(window).height() - $this.siblings('.dashboard-header').height())
-    //             var $editor = $this.find('#quill-editor')
-    //             if ($editor) {
-    //                 $editor.height($(window).height() - $editor.offset().top - 30)
-    //             }
-    //         }
-    //     }
-    //     resizeHeight()
-    //     $(window).on('resize.dashboard', function() {
-    //         resizeHeight()
-    //     })
-    // })
-
-    // $(document).on('_load.dashboard', '#dashboard-list, #dashboard-content', function(e) {
-    //     var $this = $(this)
-    //     $(window).off('resize.dashboard')
-    // })
 })
