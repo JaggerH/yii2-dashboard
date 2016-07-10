@@ -1,3 +1,46 @@
+/**
+ *  Dashboard trigger event depend on situation:
+ *  _load.dashboard
+ *  load_.dashboard
+ *  aftersubmit.dashboard { url: url, success: true|false, submit_type: create|update|index, submit_response: response } 
+ *  unload.dashboard
+ **/
+
+function dataLoad($target, options) {
+    var $loadingTip = $('<div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 40px; height: 40px; margin: auto;"> <i class="fa fa-spinner fa-spin" style="font-size: 40px; "></i></div>'),
+        beforeLoadEvent = $.Event('_load.dashboard', { url: options.url }),
+        afterLoadEvent = $.Event('load_.dashboard', { url: options.url })
+        unloadEvent = $.Event('unload.dashboard')
+
+    $target.trigger(beforeLoadEvent)
+    if ($target.attr('id') == "dashboard-modal") {
+        $target.modal('show')
+        $target = $target.find('.modal-content')
+    }
+    $target.html('').append($loadingTip)
+    $.ajax(options)
+        .success(function(response) {
+            $target.html(response)
+            $target.trigger(afterLoadEvent)
+        })
+        .fail(function(response) {
+            if ($target.attr('id') == "dashboard-modal") {
+                $target = $target.find('.modal-content')
+            }
+            if (response.status == 403) {
+                $target.html('<div class="text-center" style="margin-top: 200px;"><i class="fa fa-ban" style="font-size: 60px"></i><h3>Permission Denied</h3></div>')
+            } else if (response.status == 404) {
+                $target.html('<div class="text-center" style="margin-top: 200px;"><h1>404</h1><h3>The Page requested NOT FOUND</h3></div>')
+            } else if (response.status == 500) {
+                $target.html('<div class="text-center" style="margin-top: 200px;"><h1>500</h1><h3>There is a internal error, Contact Admin</h3></div>')
+            }
+        })
+        .done(function(data) {
+            $target.trigger(afterLoadEvent)
+            $target.trigger(unloadEvent)
+        })
+}
+
 $(document).ready(function() {
     /**------------------------------------------
      *       Dashboard Menu Controller
@@ -42,90 +85,24 @@ $(document).ready(function() {
      *       Dashboard Navigation Controller
      ------------------------------------------*/
 
-    function MessageTips(response) {
+    function Alert($target, response) {
         $tips = $('<div class="dashboard-tips"></div>')
-        if (response.success) {
-            $tips.removeClass("tips-danger").addClass("tips-success")
+        if (response.success || (response.code && response.code == 29999)) {
+            $tips.addClass("tips-success")
         } else {
-            $tips.removeClass("tips-success").addClass("tips-danger")
+            $tips.addClass("tips-danger")
         }
         $tips.text(response.message)
-        $('#dashboard-tips-handler').html($tips).collapse('show')
+        $handler = $target.attr('id') == "dashboard-modal" ? $('#modal-tips') : $('#content-tips')
+        $handler.html($tips).collapse('show')
         setTimeout(function() {
-            $('#dashboard-tips-handler').collapse('hide')
+            $handler.collapse('hide')
         }, 2000)
     }
 
-    function dataLoad($target, that, method, url, data, params) {
-        var params = $.extend(params, { _relativeTarget: that, url: url }),
-            $loadingTip = $('<div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 40px; height: 40px; margin: auto;"> <i class="fa fa-spinner fa-spin" style="font-size: 40px; "></i></div>'),
-            _loadEvent = $.Event('_load.dashboard', params),
-            isModal = false
 
-        $target.trigger(_loadEvent)
 
-        // 如果是create||update，不显示正在加载的图标
-        if (params && !/\/\w+[\w+-]*\/(create|update)/.test(url)) {
-            $target.html('').append($loadingTip)
-        }
-
-        if ($target.attr('id') == 'dashboard-modal') {
-            isModal = true
-            $target.modal({ show: true })
-            $target = $target.find('.modal-content')
-        }
-
-        $.ajax({
-                url: url,
-                type: method,
-                data: data
-            })
-            .success(function(response) {
-                if (params && params.form_submit == "create") {
-                    if (typeof response == "object") {
-                        url = url.replace("/create", "/update") + "?id=" + response.data.id
-                        if (!isModal) {
-                            dataLoad($target, that, 'get', url, null, null)
-                            listReload(response.data.id)
-                            MessageTips(response)
-                        } else {
-                            $('#dashboard-modal').modal('hide')
-                        }
-                    } else {
-                        if (!isModal) MessageTips({ message: 'Create Failed!', success: false })
-                        $target.html(response)
-                    }
-                } else if (params && params.form_submit == "update") {
-                    var id = url.match(/\?id=(.*)/)[1]
-                    if (typeof response == "object") {
-                        if (!isModal) {
-                            listReload(id)
-                            MessageTips(response)
-                        } else {
-                            $('#dashboard-modal').modal('hide')
-                        }
-                    } else {
-                        if(!isModal) MessageTips({ message: 'Update Failed!', success: false })
-                        $target.html(response)
-                    }
-                } else {
-                    $target.html(response)
-                }
-            })
-            .fail(function(response) {
-                if (response.status == 403) {
-                    $target.html('<div class="text-center" style="margin-top: 200px;"><i class="fa fa-ban" style="font-size: 60px"></i><h3>Permission Denied</h3></div>')
-                } else if (response.status == 404) {
-                    $target.html('<div class="text-center" style="margin-top: 200px;"><h1>404</h1><h3>The Page requested NOT FOUND</h3></div>')
-                }
-            })
-            .done(function(data) {
-                var load_Event = $.Event('load_.dashboard', $.extend(params, { data: data }))
-                $target.trigger(load_Event)
-            })
-    }
-
-    function listReload(active_key) {
+    function reloadList(active_key) {
         var url = $('#dashboard-list').attr('current-url')
 
         function select() {
@@ -135,15 +112,16 @@ $(document).ready(function() {
         if (active_key != "null") {
             $('#dashboard-list').on('load_.dashboard.reload', select)
         }
-        dataLoad($('#dashboard-list'), null, 'get', url, null, null)
+        dataLoad($('#dashboard-list'), { url: url, type: 'get' })
     }
 
     $(document).on('click', '[data-load]', function(e) {
-        // init 
+        if ($(this).is('a')) e.preventDefault() // prevent redirect
         var url = $(this).data('url') == undefined ? $(this).attr('href') : $(this).data('url'),
             $target = $($(this).data('load')),
             method = $(this).attr('data-method') ? $(this).attr('data-method') : 'get'
-        if ($target.length == 0 && $(this).attr('data-load') != 'none') return
+            // target ["#dashboard-list", "#dashboard-content", "#dashboard-modal"]
+        if ($target.length == 0) return
         if (url == undefined) return
 
         // 根据Menu中的expanded设置，为.dashboard-main添加属性以达到控制list, content宽度的目的
@@ -152,38 +130,97 @@ $(document).ready(function() {
         } else {
             $target.parents('.dashboard-main').removeAttr('expanded')
         }
-
-        dataLoad($target, this, method, url, null)
-
-        if ($(this).is('a')) e.preventDefault() // prevent redirect
+        // dataLoad($target, this, method, url, null)
+        dataLoad($target, { url: url, type: method })
     })
 
     $(document).on('submit', 'form', function(e) {
         e.preventDefault()
         var data = {},
             url = $(this).attr("action"),
-            method = $(this).attr("method")
+            method = $(this).attr("method") ? $(this).attr("method") : "post"
 
         if ($(this).parents('.dashboard-content').length != 0) {
-            $target = $('.dashboard-content')
-        }
-        if ($(this).parents('#dashboard-modal').length != 0) {
+            $target = $('#dashboard-content')
+        } else if ($(this).parents('#dashboard-modal').length != 0) {
             $target = $('#dashboard-modal')
+        } else if ($(this).parents('#dashboard-list').length != 0) {
+            $target = $('#dashboard-list')
+        } else {
+            throw "Not Found data-load target"
         }
-        $(this).find('input[type="text"], input[type="password"], input[type="hidden"], select').each(function() {
-            data[$(this).attr("name")] = $(this).val()
+
+        $(this).find('input, select, textarea').each(function() {
+            if (this.type == "checkbox") {
+                if (this.checked) {
+                    data[$(this).attr("name")] = $(this).val()
+                }
+            } else {
+                data[$(this).attr("name")] = $(this).val()
+            }
         })
 
-        $(this).find('textarea').each(function() {
-            data[$(this).attr("name")] = $(this).val()
-        })
+        var matches = url.match(/\/\w+[\w+-]*\/(index|create|update)/)
+        $.ajax({ url: url, type: method, data: data })
+            .success(function(response) {
+                if (typeof response == "object") {
+                    if (response.success || (response.code && response.code == 29999)) {
+                        var submitEvent = $.Event('aftersubmit.dashboard', { url: url, success: true, submit_type: matches[1], submit_response: response })
+                        $target.trigger(submitEvent)
+                        return Alert($target, response)
+                    } else {
+                        var submitEvent = $.Event('aftersubmit.dashboard', { url: url, success: false, submit_type: matches[1], submit_response: response })
+                        $target.trigger(submitEvent)
+                    }
+                } else {
+                    if ($target.attr('id') == "dashboard-modal") {
+                        $target.find('.modal-content').html(response)
+                    } else {
+                        $target.html(response)
+                    }
+                    switch (matches[1]) {
+                        case 'index':
+                            var submitEvent = $.Event('aftersubmit.dashboard', { url: url, success: true, submit_type: matches[1] })
+                            $target.trigger(submitEvent)
+                            break;
+                        case 'create':
+                            var submitEvent = $.Event('aftersubmit.dashboard', { url: url, submit_type: matches[1], success: false })
+                        case 'update':
+                            var submitEvent = $.Event('aftersubmit.dashboard', { url: url, submit_type: matches[1], success: false })
+                            $target.trigger(submitEvent)
+                            Alert($target, { success: false, message: "更新失败！" })
+                            break;
+                    }
+                }
+            })
+            .fail(function(response) {
+                if ($target.attr('id') == "dashboard-modal") {
+                    $target = $target.find('.modal-content')
+                }
+                if (response.status == 403) {
+                    $target.html('<div class="text-center" style="margin-top: 200px;"><i class="fa fa-ban" style="font-size: 60px"></i><h3>Permission Denied</h3></div>')
+                } else if (response.status == 404) {
+                    $target.html('<div class="text-center" style="margin-top: 200px;"><h1>404</h1><h3>The Page requested NOT FOUND</h3></div>')
+                } else if (response.status == 500) {
+                    $target.html('<div class="text-center" style="margin-top: 200px;"><h1>500</h1><h3>There is a internal error, Contact Admin</h3></div>')
+                }
+            })
+    })
 
-        if (/\/\w+[\w+-]*\/index/.test(url)) {
-            dataLoad($target, this, method, url, data, { form_submit: "search" })
-        } else if (/\/\w+[\w+-]*\/create/.test(url)) {
-            dataLoad($target, this, method, url, data, { form_submit: "create" })
-        } else if (/\/\w+[\w+-]*\/update/.test(url)) {
-            dataLoad($target, this, method, url, data, { form_submit: "update" })
+    $(document).on('aftersubmit.dashboard', '#dashboard-modal', function(e) {
+        if (e.success) {
+            $('#dashboard-modal').modal('hide')
+        }
+    })
+
+    $(document).on('aftersubmit.dashboard', '#dashboard-content', function(e) {
+        if (e.success) {
+            reloadList(e.submit_response.data.id)
+            if (e.submit_type == "create") {
+                // console.log(e)
+                var url = e.url.replace(/\/create.*/, "/update") + "?id=" + e.submit_response.data.id
+                dataLoad($(this), { url: url, method: 'get' })
+            }
         }
     })
 
@@ -192,26 +229,14 @@ $(document).ready(function() {
      ------------------------------------------*/
     // 对待search事件，在加载之前需要设定一个可读取的before-search url, 加载后为其添加data-load属性
     $(document).on('_load.dashboard', '#dashboard-list', function(e) {
-        if (typeof e.form_submit != 'undefined') {
-            if (e.form_submit == "search") {
-                var before_url = $(this).attr('before-search')
-                if (typeof before_url == 'undefined' || before_url == '') {
-                    before_url = $(this).attr('current-url')
-                    $(this).attr('before-search', before_url)
-                }
-            }
-        } else {
-            $(this).attr('current-url', e.url)
-        }
+        $(this).attr('current-url', e.url)
     })
 
-    $(document).on('load_.dashboard', '#dashboard-list', function(e) {
-        if (typeof e.form_submit != 'undefined') {
-            if (e.form_submit == "search") {
-                var before_url = $(this).attr('before-search')
-                $('#dashboard-list [action-bk2bsearch]').attr('data-load', '#dashboard-list')
-                    .attr('data-url', before_url)
-            }
+    $(document).on('aftersubmit.dashboard', '#dashboard-list', function(e) {
+        if (e.submit_type == "index") {
+            $('#dashboard-list').attr('before-search', $(this).attr('current-url'))
+            $('#dashboard-list [action-bk2bsearch]').attr('data-load', '#dashboard-list')
+                .attr('data-url', $(this).attr('before-search'))
         }
     })
 
@@ -272,7 +297,7 @@ $(document).ready(function() {
                     // reload after delete
                     if (finish_delete) {
                         var url = $('#dashboard-list').attr('current-url')
-                        dataLoad($('#dashboard-list'), this, 'get', url, null)
+                        dataLoad($('#dashboard-list'), { url: url, type: 'get' })
                         clearInterval(refresh)
                     }
                 }, 200)

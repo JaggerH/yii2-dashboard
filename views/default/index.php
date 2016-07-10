@@ -55,7 +55,7 @@ use jackh\aurora\SideBar;
 		"公司高管" => [
 			"options" => [
 				"data-load" => "#dashboard-list",
-				"data-url" => "exectives/index",
+				"data-url" => "executive/index",
 			],
 		],
 		"分公司信息" => [
@@ -119,7 +119,7 @@ use jackh\aurora\SideBar;
                 <i class="fa fa-sign-out"></i>
             </div>
         </div>
-        <div class="collapse" aria-expanded="false" id="dashboard-tips-handler"></div>
+        <div class="collapse" aria-expanded="false" id="content-tips"></div>
         <div id="dashboard-content">
             <?=$this->render('overview');?>
         </div>
@@ -132,3 +132,4 @@ use jackh\aurora\SideBar;
     </div>
   </div>
 </div>
+<div class="collapse dashboard-tips-handler" aria-expanded="false" id="modal-tips"></div>

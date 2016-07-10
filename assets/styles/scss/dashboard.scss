@@ -32,7 +32,7 @@ $dashboard-list-selected-bg: RGB(139, 139, 145);
 
 #dashboard-content {
     padding: 30px;
-    height: calc(100% - $dashboard-header-height);
+    height: calc(100% - 72px);
     overflow-y: scroll;
 }
 
@@ -212,11 +212,16 @@ $dashboard-list-selected-bg: RGB(139, 139, 145);
     @include border-bottom-radius(5px);
 }
 
-#dashboard-tips-handler {
+.dashboard-tips-handler {
     width: 100%;
     position: absolute;
     top: 72px;
     z-index: 99;
+}
+
+#modal-tips {
+    top: 0px;
+    z-index: 9999;
 }
 
 .dashboard-tips {
@@ -286,7 +291,7 @@ $sidebar-color: RGB(136, 157, 169);
 $sidebar-opened-border-color: RGB(85, 164, 211);
 $sidebar-submenu-hover-bg-color: RGB(44, 52, 55);
 .aurora-sidebar {
-    height: calc(100% - $dashboard-header-height);
+    height: calc(100% - 72px);
     overflow-y: scroll;
     .nav>li {
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -362,4 +367,33 @@ $sidebar-submenu-hover-bg-color: RGB(44, 52, 55);
 
 *::-webkit-scrollbar {
     display: none;
+}
+
+.grid-panel {
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    .create-button {
+        position: absolute;
+        top: 0;
+        right: 0
+    }
+    .action-bar {
+        display: inline;
+        color: #337ab7;
+        cursor: pointer;
+        &:hover {
+            color: black;
+        }
+    }
+}
+
+#dashboard-modal .modal-body {
+    overflow: auto;
+}
+
+.choose-avatar {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
 }

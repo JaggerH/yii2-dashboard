@@ -18,7 +18,10 @@ use yii\helpers\Html;
 
 ?>
 <div class="<?=Inflector::camel2id(StringHelper::basename($generator->modelClass))?>-update">
-
+    <?=$generator->enablePjax ? '<div class="modal-header">
+        <h4 class="modal-title">' . StringHelper::basename($generator->modelClass) . '</h4>
+    </div>
+    ' : ''?>
     <?="<?= "?>$this->render('_form', [
         'model' => $model,
     ]) ?>

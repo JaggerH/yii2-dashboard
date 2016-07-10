@@ -141,6 +141,9 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
                 'data' => [
                     'message' => Yii::t('app', "Update Success!"),
                     'success' => true,
+                    'data' => [
+                        'id' => <?=$actionParams?>
+                    ],
                 ],
             ]);
         } else {
