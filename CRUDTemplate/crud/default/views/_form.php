@@ -38,7 +38,7 @@ use jackh\aurora\ActiveForm;
     <?="<?= "?>Html::submitButton($model->isNewRecord ? <?=$generator->generateString('Create')?> : <?=$generator->generateString('Update')?>, ['class' => $model->isNewRecord ? 'btn btn-primary' : 'btn btn-primary']) ?>
     </div>
     <?php else: ?>
-    <?="<?= "?>Html::submitButton($model->isNewRecord ? <?=$generator->generateString('Create')?> : <?=$generator->generateString('Update')?>, ['class' => $model->isNewRecord ? 'btn btn-primary' : 'btn btn-primary', 'style' => 'position: absolute; top: 20px']) ?>
+    <?="<?= "?>Html::submitButton($model->isNewRecord ? <?=$generator->generateString('Create')?> : <?=$generator->generateString('Update')?>, ['class' => $model->isNewRecord ? 'btn btn-primary' : 'btn btn-primary', 'style' => 'position: absolute; top: 20px; left: 30px;']) ?>
     </div>
     <?php endif;?>
     <?="<?php "?>ActiveForm::end(); ?>

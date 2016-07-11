@@ -12,6 +12,7 @@ function dataLoad($target, options) {
         afterLoadEvent = $.Event('load_.dashboard', { url: options.url })
         unloadEvent = $.Event('unload.dashboard')
 
+    $target.trigger(unloadEvent)
     $target.trigger(beforeLoadEvent)
     if ($target.attr('id') == "dashboard-modal") {
         $target.modal('show')
@@ -37,7 +38,6 @@ function dataLoad($target, options) {
         })
         .done(function(data) {
             $target.trigger(afterLoadEvent)
-            $target.trigger(unloadEvent)
         })
 }
 

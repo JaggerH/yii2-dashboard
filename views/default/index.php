@@ -8,12 +8,16 @@ use jackh\aurora\SideBar;
     </div>
 <?=SideBar::widget([
 	"column" => [
-		"首页" => [
+		"页面编辑" => [
+			// "options" => [
+			// 	"data-load" => "#dashboard-content",
+			// 	"data-url" => "site/index",
+			// 	"class" => "selected",
+			// 	"expanded" => "true",
+			// ],
 			"options" => [
-				"data-load" => "#dashboard-content",
-				"data-url" => "default/overview",
-				"class" => "selected",
-				"expanded" => "true",
+				"data-load" => "#dashboard-list",
+				"data-url" => "edite/index",
 			],
 		],
 		"基金产品" => [
@@ -121,7 +125,7 @@ use jackh\aurora\SideBar;
         </div>
         <div class="collapse" aria-expanded="false" id="content-tips"></div>
         <div id="dashboard-content">
-            <?=$this->render('overview');?>
+            <?=$this->render('@backend/views/site/index');?>
         </div>
     </div>
 </div>
