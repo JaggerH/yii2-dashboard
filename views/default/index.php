@@ -44,7 +44,7 @@ use jackh\aurora\SideBar;
         </div>
         <div class="collapse" aria-expanded="false" id="content-tips"></div>
         <div id="dashboard-content">
-            <?=$this->render('@backend/views/site/index');?>
+            <?=$this->render(Yii::$app->params['dashboardInitPage']);?>
         </div>
     </div>
 </div>
