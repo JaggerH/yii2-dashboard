@@ -10,7 +10,7 @@ function dataLoad($target, options) {
     var $loadingTip = $('<div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; width: 40px; height: 40px; margin: auto;"> <i class="fa fa-spinner fa-spin" style="font-size: 40px; "></i></div>'),
         beforeLoadEvent = $.Event('_load.dashboard', { url: options.url }),
         afterLoadEvent = $.Event('load_.dashboard', { url: options.url })
-    unloadEvent = $.Event('unload.dashboard')
+        unloadEvent = $.Event('unload.dashboard')
 
     $target.trigger(unloadEvent)
     $target.trigger(beforeLoadEvent)
@@ -165,7 +165,6 @@ $(document).ready(function() {
                 }
             }
         })
-        console.log(data)
         var matches = url.match(/\/\w+[\w+-]*\/(index|create|update)/)
         $.ajax({ url: url, type: method, data: data })
             .success(function(response) {
