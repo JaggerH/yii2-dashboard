@@ -37,6 +37,7 @@ use yii\data\ActiveDataProvider;
 use <?=ltrim($generator->baseControllerClass, '\\')?>;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * <?=$controllerClass?> implements the CRUD actions for <?=$modelClass?> model.
@@ -55,6 +56,14 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
                     'delete' => ['post'],
                 ],
             ],
+            'contentNegotiator' => [
+                'class' => \yii\filters\ContentNegotiator::className(),
+                'only' => ['upload'],
+                'formatParam' => '_format',
+                'formats' => [
+                    'application/json' => \yii\web\Response::FORMAT_JSON,
+                ],
+            ],
         ];
     }
 
@@ -62,11 +71,11 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
      * Lists all <?=$modelClass?> models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($bid)
     {
 <?php if (!empty($generator->searchModelClass)): ?>
         $searchModel = new <?=isset($searchModelAlias) ? $searchModelAlias : $searchModelClass?>();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(["<?=$searchModelClass?>"] => ["bid" => $bid]);
         $dataProvider->setPagination(["pageSize" => 15]);
 
         return $this->render('index', [
@@ -75,54 +84,16 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
         ]);
 <?php else: ?>
         $dataProvider = new ActiveDataProvider([
-            'query' => <?=$modelClass?>::find(),
+            'query' => <?=$modelClass?>::find()->where(["bid" => $bid]),
         ]);
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
+            'bid' => $bid,
         ]);
 <?php endif;?>
     }
 
-    /**
-     * Displays a single <?=$modelClass?> model.
-     * <?=implode("\n     * ", $actionParamComments) . "\n"?>
-     * @return mixed
-     */
-    public function actionView(<?=$actionParams?>)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel(<?=$actionParams?>),
-        ]);
-    }
-
-    /**
-     * Creates a new <?=$modelClass?> model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new <?=$modelClass?>();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return \Yii::createObject([
-                'class' => 'yii\web\Response',
-                'format' => \yii\web\Response::FORMAT_JSON,
-                'data' => [
-                    'message' => Yii::t('app', "Create Success!"),
-                    'success' => true,
-                    'data' => [
-                        'id' => $model-><?=trim($actionParams, "$")?>
-                    ],
-                ],
-            ]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
-    }
 
     /**
      * Updates an existing <?=$modelClass?> model.
@@ -151,6 +122,30 @@ class <?=$controllerClass?> extends <?=StringHelper::basename($generator->baseCo
                 'model' => $model,
             ]);
         }
+    }
+
+    public function actionUpload($bid) {
+        $model = new <?=$modelClass?>;
+        if (Yii::$app->request->isPost) {
+            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
+            $filepath = $model->upload();
+            if ($filepath !== false) {
+                // file is uploaded successfully
+                $model->setScenario('default');
+                $model->setAttributes([
+                    // "bid" => (int) $bid,
+                    "url" => $filepath,
+                ]);
+                $model->save();
+                return [
+                    'success' => true,
+                    'data' => [
+                        'url' => $filepath,
+                    ],
+                ];
+            }
+        }
+        return ["success" => false];
     }
 
     /**
