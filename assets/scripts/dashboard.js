@@ -166,6 +166,9 @@ $(document).ready(function() {
             }
         })
         var matches = url.match(/\/\w+[\w+-]*\/(index|create|update)/)
+        if(!matches) {
+            return
+        }
         $.ajax({ url: url, type: method, data: data })
             .success(function(response) {
                 if (typeof response == "object") {
@@ -191,6 +194,9 @@ $(document).ready(function() {
                             break;
                         case 'create':
                             var submitEvent = $.Event('aftersubmit.dashboard', { url: url, submit_type: matches[1], success: false })
+                            $target.trigger(submitEvent)
+                            Alert($target, { success: false, message: "创建失败！" })
+                            break;
                         case 'update':
                             var submitEvent = $.Event('aftersubmit.dashboard', { url: url, submit_type: matches[1], success: false })
                             $target.trigger(submitEvent)

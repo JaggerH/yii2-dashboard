@@ -88,6 +88,13 @@ $dashboard-list-selected-bg: RGB(139, 139, 145);
     }
 }
 
+.dashboard-list > div {
+    height: 100%;
+    .list-view {
+        height: calc(100% - 72px);
+    }
+}
+
 .dashboard-list .dashboard-header {
     padding: 0 10px;
 }
@@ -389,7 +396,7 @@ $sidebar-submenu-hover-bg-color: RGB(44, 52, 55);
 }
 
 #dashboard-modal {
-    overflow-y: scroll; 
+    overflow-y: scroll;
 }
 
 #dashboard-modal .modal-body {
